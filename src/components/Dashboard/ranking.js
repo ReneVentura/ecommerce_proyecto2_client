@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-
+import domtoimage from 'dom-to-image';
 import './rankign.css';
 import {db, firebase, auth} from './config/firebase.config';
 import html2canvas from 'html2canvas';
@@ -22,16 +22,15 @@ import {
 
 function toPDF(){
  
-    const input = document.getElementById('chartrankning');
-    html2canvas(input)
-      .then((canvas) => {
-        const imgData = canvas.toDataURL('image/png');
-        const pdf = new jsPDF();
-        pdf.addImage(imgData, 'JPEG',300, 800,50,50);
-        // pdf.output('dataurlnewwindow');
-        pdf.save("charts.pdf");
-      })
-    ;
+  const input = document.getElementById('chartrankning');
+  const pdf = new jsPDF('landscape');
+  if (pdf) {
+    domtoimage.toPng(input)
+      .then(imgData => {
+        pdf.addImage(imgData, 'PNG',-10, 50,320,80);
+        pdf.save('chart.pdf');
+      });
+  }
 }
 
 
@@ -103,17 +102,17 @@ for(var j=0; j<ddb.length;j++)
  return (
    
     <div style={{ textAlign: "center" }} id="chartadminr">
-      <h1></h1>
+      <h1 className="tituloadmins">Administradores con mas chats completados</h1>
       <div className="App" id="chartrankning">
       {()=>toPDF()}
         <BarChart
-          width={1200}
+          width={1500}
           height={300}
           data={datas}
           margin={{
             top: 5,
-            right: 30,
-            left: 80,
+            right: 80,
+            left: 300,
             bottom: 5,
           }}
           barSize={20}
@@ -127,7 +126,7 @@ for(var j=0; j<ddb.length;j++)
           <Tooltip />
           <Legend />
           <CartesianGrid strokeDasharray="3 3" />
-          <Bar dataKey="chats" fill="#8884d8" background={{ fill: "#eee" }} />
+          <Bar dataKey="chats" fill="#474747" background={{ fill: "#eee" }} />
         </BarChart>
       </div>
       <button class="btn btn-accept" onClick= {toPDF} > Descarga pdf</button>
@@ -136,3 +135,4 @@ for(var j=0; j<ddb.length;j++)
 };
 
 export default Ranking;
+
